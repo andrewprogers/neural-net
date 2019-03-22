@@ -1,0 +1,17 @@
+/Users/andrewrogers/Desktop/Development Project/neuralNet/NetworkTests/bin/Debug/netcoreapp2.1/xunit.runner.visualstudio.dotnetcore.testadapter.dll
+/Users/andrewrogers/Desktop/Development Project/neuralNet/NetworkTests/bin/Debug/netcoreapp2.1/xunit.runner.reporters.netcoreapp10.dll
+/Users/andrewrogers/Desktop/Development Project/neuralNet/NetworkTests/bin/Debug/netcoreapp2.1/xunit.runner.utility.netcoreapp10.dll
+/Users/andrewrogers/Desktop/Development Project/neuralNet/NetworkTests/bin/Debug/netcoreapp2.1/NetworkTests.deps.json
+/Users/andrewrogers/Desktop/Development Project/neuralNet/NetworkTests/bin/Debug/netcoreapp2.1/NetworkTests.runtimeconfig.json
+/Users/andrewrogers/Desktop/Development Project/neuralNet/NetworkTests/bin/Debug/netcoreapp2.1/NetworkTests.runtimeconfig.dev.json
+/Users/andrewrogers/Desktop/Development Project/neuralNet/NetworkTests/bin/Debug/netcoreapp2.1/NetworkTests.dll
+/Users/andrewrogers/Desktop/Development Project/neuralNet/NetworkTests/bin/Debug/netcoreapp2.1/NetworkTests.pdb
+/Users/andrewrogers/Desktop/Development Project/neuralNet/NetworkTests/obj/Debug/netcoreapp2.1/NetworkTests.csprojAssemblyReference.cache
+/Users/andrewrogers/Desktop/Development Project/neuralNet/NetworkTests/obj/Debug/netcoreapp2.1/NetworkTests.csproj.CoreCompileInputs.cache
+/Users/andrewrogers/Desktop/Development Project/neuralNet/NetworkTests/obj/Debug/netcoreapp2.1/NetworkTests.AssemblyInfoInputs.cache
+/Users/andrewrogers/Desktop/Development Project/neuralNet/NetworkTests/obj/Debug/netcoreapp2.1/NetworkTests.AssemblyInfo.cs
+/Users/andrewrogers/Desktop/Development Project/neuralNet/NetworkTests/obj/Debug/netcoreapp2.1/NetworkTests.dll
+/Users/andrewrogers/Desktop/Development Project/neuralNet/NetworkTests/obj/Debug/netcoreapp2.1/NetworkTests.pdb
+/Users/andrewrogers/Desktop/Development Project/neuralNet/NetworkTests/bin/Debug/netcoreapp2.1/neuralNet.dll
+/Users/andrewrogers/Desktop/Development Project/neuralNet/NetworkTests/bin/Debug/netcoreapp2.1/neuralNet.pdb
+/Users/andrewrogers/Desktop/Development Project/neuralNet/NetworkTests/obj/Debug/netcoreapp2.1/NetworkTests.csproj.CopyComplete
