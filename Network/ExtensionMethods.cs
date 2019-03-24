@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace neuralNet
+namespace NeuralNet
 {
     public static class ExtensionMethods
     {

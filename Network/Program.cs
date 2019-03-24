@@ -4,7 +4,7 @@ using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 
-namespace neuralNet
+namespace NeuralNet
 {
     class Program
     {
@@ -17,8 +17,8 @@ namespace neuralNet
                 var activation = new Sigmoid();
                 var net = new Network(new List<int>() { 784, 30, 10 }, activation);
 
-                trainingExamples = trainingExamples.GetRange(0, 10000);
-                net.SGD(trainingExamples, 30, 10, 3.0, testExamples);
+                //trainingExamples = trainingExamples.GetRange(0, 10000);
+                net.SGD(trainingExamples, 30, 100, 3.0, testExamples);
             }
             catch (System.Exception ex)
             {

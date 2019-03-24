@@ -5,54 +5,38 @@ using MathNet.Numerics.LinearAlgebra;
 using Vec = MathNet.Numerics.LinearAlgebra.Vector<System.Double>;
 using Matrix = MathNet.Numerics.LinearAlgebra.Matrix<System.Double>;
 
-namespace neuralNet
+namespace NeuralNet
 {
     class Network
     {
-        public int NumLayers { get; }
-        public List<int> Sizes { get; }
-        public List<Vec> Biases { get; }
-        public List<Matrix<double>> Weights { get; }
-        private Func<Vec, Vec> Activation;
-        private Func<Vec, Vec> ActivationPrime;
+        private List<Layer> Layers = new List<Layer>();
 
-        public Network(List<int> sizes, Activation activation)
+        public Network(List<int> sizes, Activator activator)
         {
-            Activation = activation.GetActivation();
-            ActivationPrime = activation.GetActivationPrime();
-
-            NumLayers = sizes.Count;
-            Sizes = sizes;
-            Biases = sizes.Skip(1).Select(layerSize => Vec.Build.Random(layerSize)).ToList();
-            Weights = sizes.Zip(sizes.Skip(1), (columns, rows) => Matrix<double>.Build.Random(rows, columns)).ToList();
+            Layer layer = null;
+            foreach(var size in Enumerable.Reverse(sizes))
+            {
+                layer = new Layer(size, layer, activator);
+                Layers.Add(layer);
+            }
+            Layers.Reverse();
         }
 
         public void Print()
         {
-            Console.WriteLine(NumLayers);
-            Console.WriteLine(String.Join(", ", Sizes));
-            Console.WriteLine(String.Join("\n", Biases));
-            Console.WriteLine(String.Join("\n", Weights));
+            foreach (var l in Layers)
+            {
+                l.Print();
+            }
         }
 
-        public FeedForwardResult FeedForward(Vec input)
+        public Vec FeedForward(Vec input)
         {
-            var activations = new List<Vec>();
-            activations.Add(input.Clone());
-
-            var layers = Biases.Zip(Weights, (b, w) => (biases: b, weights: w)).ToList();
-            var zValues = new List<Vec>();
-            foreach (var l in layers)
-            {
-                var z = l.weights.Multiply(activations.Last()) + l.biases;
-                zValues.Add(z);
-                activations.Add(Activation(z));
+            Layers[0].Activations = input;
+            foreach(Layer l in Layers.Skip(1)){
+                l.Activate();
             }
-            return (new FeedForwardResult()
-            {
-                Activations = activations,
-                ZValues = zValues
-            });
+            return Layers.Last().Activations;
         }
 
         public void SGD(List<Example> trainingData, int epochs, int batchSize, double learningRate, List<Example> testData)
@@ -84,8 +68,8 @@ namespace neuralNet
             var successCount = 0;
             foreach (var example in testData)
             {
-                var forwardResult = FeedForward(example.Image);
-                var digit = ConvertActivationToDigit(forwardResult.Activations.Last());
+                var result = FeedForward(example.Image);
+                var digit = ConvertActivationToDigit(result);
                 if (example.Label[digit] == 1)
                 {
                     successCount++;
@@ -102,83 +86,43 @@ namespace neuralNet
 
         private void UpdateMiniBatch(List<Example> batch, double learningRate)
         {
-            var nablaBiases = Biases.Select(b => Vec.Build.Dense(b.Count, 0)).ToList();
-            var nablaWeights = Weights.Select(w => Matrix<Double>.Build.Dense(w.RowCount, w.ColumnCount, 0)).ToList();
+            var nablaBiases = Layers.Skip(1).Select(l => Vec.Build.Dense(l.Biases.Count, 0)).ToList();
+            var nablaWeights = Layers.Skip(1).Select(l => Matrix<Double>.Build.Dense(l.Weights.RowCount, l.Weights.ColumnCount, 0)).ToList();
             foreach (var example in batch)
             {
-                var (deltaBiases, deltaWeights) = BackPropagate(example);
-                for (int i = 0; i < NumLayers - 1; i++)
+                Backpropagate(example);
+                for (int i = 1; i < Layers.Count; i++)
                 {
-                    nablaBiases[i] += deltaBiases[i];
-                    nablaWeights[i] += deltaWeights[i];
+                    nablaBiases[i - 1] += Layers[i].DCostDBiases;
+                    nablaWeights[i - 1] += Layers[i].DCostDWeights;
                 }
             }
-            for (int i = 0; i < NumLayers - 1; i++)
+            for (int i = 1; i < Layers.Count; i++)
             {
-                Biases[i] -= (learningRate / batch.Count) * nablaBiases[i];
-                Weights[i] -= (learningRate / batch.Count) * nablaWeights[i];
+                var biasChange  = (learningRate / batch.Count) * nablaBiases[i - 1];
+                Layers[i].Biases -= biasChange;
+                System.Console.WriteLine((Math.Sqrt(biasChange.DotProduct(biasChange))));
+                var weightChange = (learningRate / batch.Count) * nablaWeights[i - 1];
+                Layers[i].Weights -= weightChange;
             }
         }
 
-        private (List<Vec>, List<Matrix<Double>>) BackPropagate(Example example)
+        private void Backpropagate(Example example)
         {
             // Feed forward the input data -> output activations
             var x = example.Image;
             var y = example.Label;
             var forwardResults = FeedForward(x);
-            var activations = forwardResults.Activations;
-            var zValues = forwardResults.ZValues;
-
-
-            var errors = Biases.Select(b => Vec.Build.Dense(b.Count, 0)).ToList();
 
             // Caclulate errors in output layer:
-            errors[errors.Count - 1] = (activations.Last() - y).PointwiseMultiply(ActivationPrime(zValues[zValues.Count - 1]));
+            var last = Layers.Last();
+            last.Errors = (last.Activations - y).PointwiseMultiply(last.Activator.ActivatePrime(last.ZValues));
 
             // Back Propagate errors
-            for (int layer = errors.Count - 2; layer >= 0; layer--)
+            foreach(var l in Enumerable.Reverse(Layers.Skip(1)).Skip(1))  //Reverse order excluding first and last layers
             {
-                errors[layer] = Weights[layer + 1]
-                    .TransposeThisAndMultiply(errors[layer + 1])
-                    .PointwiseMultiply(ActivationPrime(zValues[layer]));
+                l.Backpropagate();
             }
-
-            var delBiases = errors;
-            var delWeights = errors.Zip(activations, (e, a) =>
-                e.ToColumnMatrix().Multiply(a.ToRowMatrix())
-            ).ToList();
-
-            return (delBiases, delWeights);
-        }
-    }
-
-    public class FeedForwardResult
-    {
-        public List<Vec> Activations { get; set; }
-        public List<Vec> ZValues { get; set; }
-    }
-
-    public class Layer
-    {
-        public Matrix Weights { get; private set; } = null;
-        public Vec Biases { get; private set; } = null;
-        public int NeuronCount { get; private set; }
-
-        public Layer NextLayer { get; set; }
-        public Layer PreviousLayer { get; set; }
-
-        public Layer(int size, Layer next = null)
-        {
-            NeuronCount = size;
-
-            if (next != null)
-            {
-                NextLayer = next;
-                next.PreviousLayer = this;
-                Weights = Matrix.Build.Random(next.NeuronCount, this.NeuronCount);
-                Biases = Vec.Build.Random(size);
-            }
-
         }
     }
 }

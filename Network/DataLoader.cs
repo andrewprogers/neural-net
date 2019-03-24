@@ -5,7 +5,7 @@ using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Storage;
 
-namespace neuralNet
+namespace NeuralNet
 {
     public static class DataLoader
     {
