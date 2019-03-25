@@ -50,6 +50,7 @@ namespace NeuralNet
                     var pixels = new byte[numPixels];
                     file.Read(pixels, 0, numPixels);
                     var imageVector = Vector<Double>.Build.DenseOfArray(pixels.Select(b => (double)b).ToArray());
+                    imageVector = imageVector.Divide(256);
                     images.Add(imageVector);
                 }
                 return images;

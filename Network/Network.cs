@@ -4,6 +4,7 @@ using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
 using Vec = MathNet.Numerics.LinearAlgebra.Vector<System.Double>;
 using Matrix = MathNet.Numerics.LinearAlgebra.Matrix<System.Double>;
+using System.Diagnostics;
 
 namespace NeuralNet
 {
@@ -14,7 +15,7 @@ namespace NeuralNet
         public Network(List<int> sizes, Activator activator)
         {
             Layer layer = null;
-            foreach(var size in Enumerable.Reverse(sizes))
+            foreach (var size in Enumerable.Reverse(sizes))
             {
                 layer = new Layer(size, layer, activator);
                 Layers.Add(layer);
@@ -33,7 +34,8 @@ namespace NeuralNet
         public Vec FeedForward(Vec input)
         {
             Layers[0].Activations = input;
-            foreach(Layer l in Layers.Skip(1)){
+            foreach (Layer l in Layers.Skip(1))
+            {
                 l.Activate();
             }
             return Layers.Last().Activations;
@@ -43,6 +45,7 @@ namespace NeuralNet
         {
             for (int e = 0; e < epochs; e++)
             {
+                var w = Stopwatch.StartNew();
                 trainingData.Shuffle();
                 int batchStart = 0;
                 while (batchStart < trainingData.Count)
@@ -55,7 +58,7 @@ namespace NeuralNet
                     batchStart += batchSize;
                 }
 
-                System.Console.WriteLine($"Epoch {e + 1} of {epochs} completed. ");
+                System.Console.WriteLine($"Epoch {e + 1} of {epochs} completed in {w.Elapsed.TotalSeconds}s");
                 if (testData.Count > 0)
                 {
                     EvaluateTestData(testData);
@@ -85,7 +88,7 @@ namespace NeuralNet
         }
 
         private void UpdateMiniBatch(List<Example> batch, double learningRate)
-        {
+        {            
             var nablaBiases = Layers.Skip(1).Select(l => Vec.Build.Dense(l.Biases.Count, 0)).ToList();
             var nablaWeights = Layers.Skip(1).Select(l => Matrix<Double>.Build.Dense(l.Weights.RowCount, l.Weights.ColumnCount, 0)).ToList();
             foreach (var example in batch)
@@ -96,12 +99,12 @@ namespace NeuralNet
                     nablaBiases[i - 1] += Layers[i].DCostDBiases;
                     nablaWeights[i - 1] += Layers[i].DCostDWeights;
                 }
+                
             }
             for (int i = 1; i < Layers.Count; i++)
             {
-                var biasChange  = (learningRate / batch.Count) * nablaBiases[i - 1];
+                var biasChange = (learningRate / batch.Count) * nablaBiases[i - 1];
                 Layers[i].Biases -= biasChange;
-                System.Console.WriteLine((Math.Sqrt(biasChange.DotProduct(biasChange))));
                 var weightChange = (learningRate / batch.Count) * nablaWeights[i - 1];
                 Layers[i].Weights -= weightChange;
             }
@@ -119,10 +122,13 @@ namespace NeuralNet
             last.Errors = (last.Activations - y).PointwiseMultiply(last.Activator.ActivatePrime(last.ZValues));
 
             // Back Propagate errors
-            foreach(var l in Enumerable.Reverse(Layers.Skip(1)).Skip(1))  //Reverse order excluding first and last layers
+            foreach (var l in Enumerable.Reverse(Layers.Skip(1)).Skip(1))  //Reverse order excluding first and last layers
             {
                 l.Backpropagate();
             }
+
         }
     }
 }
+
+// backpropagation of errors from layer to layer?

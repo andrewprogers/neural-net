@@ -1,0 +1,41 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v2.1",
+    "signature": "025c4ceed2d1a4c8b3b2eba5b1ecf887bb59167a"
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v2.1": {
+      "neuralNet/1.0.0": {
+        "dependencies": {
+          "MathNet.Numerics": "4.7.0"
+        },
+        "runtime": {
+          "neuralNet.dll": {}
+        }
+      },
+      "MathNet.Numerics/4.7.0": {
+        "runtime": {
+          "lib/netstandard2.0/MathNet.Numerics.dll": {
+            "assemblyVersion": "4.7.0.0",
+            "fileVersion": "4.7.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "neuralNet/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "MathNet.Numerics/4.7.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-xuqSpkRhJeCh0Z6DM5ikKjp+GwMvarmMfejeqfwo1c7flaZlj25OgQTRO1no8Gf0NJRd9qnighupRcl1iUmGfg==",
+      "path": "mathnet.numerics/4.7.0",
+      "hashPath": "mathnet.numerics.4.7.0.nupkg.sha512"
+    }
+  }
+}
