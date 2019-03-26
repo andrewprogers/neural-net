@@ -19,7 +19,6 @@ namespace NeuralNet
                 var activation = new Sigmoid();
                 var net = new Network(new List<int>() { 784, 30, 10 }, activation);
 
-                //trainingExamples = trainingExamples.GetRange(0, 10000);
                 net.SGD(trainingExamples, 30, 10, 3.0, testExamples);
             }
             catch (System.Exception ex)

@@ -9,9 +9,6 @@ namespace NeuralNet
 {
     public class Layer
     {
-        public Func<int, int, double> initM = (row, col) => ((((row + 1) * (col + 1)) % 100) - 50) / 100.0;
-        public Func<int, double> initC = (row) => (((row + 1) % 100) - 50) / 100.0;
-
         public Vec Biases { get; set; } = null;
         public int NeuronCount { get; private set; }
         public Activator Activator { get; private set; }
@@ -37,8 +34,6 @@ namespace NeuralNet
                 next.PreviousLayer = this;
                 next.Weights = Matrix.Build.Random(next.NeuronCount, this.NeuronCount);
                 next.Biases = Vec.Build.Random(next.NeuronCount);
-                // next.Weights = Matrix.Build.Dense(next.NeuronCount, this.NeuronCount, initM);
-                // next.Biases = Vec.Build.Dense(next.NeuronCount, initC);
             }
         }
 

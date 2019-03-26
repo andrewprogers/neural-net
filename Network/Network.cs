@@ -113,22 +113,17 @@ namespace NeuralNet
         private void Backpropagate(Example example)
         {
             // Feed forward the input data -> output activations
-            var x = example.Image;
-            var y = example.Label;
-            var forwardResults = FeedForward(x);
+            FeedForward(example.Image);
 
             // Caclulate errors in output layer:
             var last = Layers.Last();
-            last.Errors = (last.Activations - y).PointwiseMultiply(last.Activator.ActivatePrime(last.ZValues));
+            last.Errors = (last.Activations - example.Label).PointwiseMultiply(last.Activator.ActivatePrime(last.ZValues));
 
             // Back Propagate errors
             foreach (var l in Enumerable.Reverse(Layers.Skip(1)).Skip(1))  //Reverse order excluding first and last layers
             {
                 l.Backpropagate();
             }
-
         }
     }
 }
-
-// backpropagation of errors from layer to layer?
