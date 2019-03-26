@@ -7,12 +7,12 @@ namespace NeuralNet
     {
         public virtual Matrix GetWeights(Layer layer)
         {
-            return Matrix.Build.Random(layer.NextLayer.NeuronCount, layer.NeuronCount);
+            return Matrix.Build.Random(layer.NeuronCount, layer.PreviousLayer.NeuronCount);
         }
 
         public virtual Vec GetBiases(Layer layer)
         {
-            return Vec.Build.Random(layer.NextLayer.NeuronCount);
+            return Vec.Build.Random(layer.NeuronCount);
         }
     }
 }

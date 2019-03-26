@@ -11,7 +11,9 @@ namespace NeuralNet
     {
         public Vec Biases { get; set; } = null;
         public int NeuronCount { get; private set; }
+
         public Activator Activator { get; private set; }
+        public IWeightBiasInitializer Initializer { get; private set; }
 
         public Layer NextLayer { get; set; }
         public Layer PreviousLayer { get; set; }
@@ -22,19 +24,26 @@ namespace NeuralNet
         private Matrix _weights = null;
         private Vec _errors = null;
 
-        public Layer(int size, Layer next = null, Activator activator = null)
+        public Layer(int size, Layer next = null, Activator activator = null, IWeightBiasInitializer initializer = null)
         {
             NeuronCount = size;
             Activations = Vec.Build.Dense(size, 0);
             Activator = activator;
 
+            Initializer = (initializer == null) ? new GaussianInitializer() : initializer;
+
             if (next != null)
             {
                 NextLayer = next;
                 next.PreviousLayer = this;
-                next.Weights = Matrix.Build.Random(next.NeuronCount, this.NeuronCount);
-                next.Biases = Vec.Build.Random(next.NeuronCount);
+                next.InitializeWeightsAndBiases();
             }
+        }
+
+        public void InitializeWeightsAndBiases()
+        {
+            Weights = Initializer.GetWeights(this);
+            Biases = Initializer.GetBiases(this);
         }
 
         public Vec Activate(Vec inputActivations)

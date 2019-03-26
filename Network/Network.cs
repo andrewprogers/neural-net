@@ -12,12 +12,12 @@ namespace NeuralNet
     {
         private List<Layer> Layers = new List<Layer>();
 
-        public Network(List<int> sizes, Activator activator)
+        public Network(List<int> sizes, Activator activator, IWeightBiasInitializer defaultInitializer = null)
         {
             Layer layer = null;
             foreach (var size in Enumerable.Reverse(sizes))
             {
-                layer = new Layer(size, layer, activator);
+                layer = new Layer(size, layer, activator, defaultInitializer);
                 Layers.Add(layer);
             }
             Layers.Reverse();

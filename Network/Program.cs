@@ -17,7 +17,8 @@ namespace NeuralNet
                 var trainingExamples = DataLoader.LoadFromFiles("./data/train-labels-idx1-ubyte", "./data/train-images-idx3-ubyte");
                 var testExamples = DataLoader.LoadFromFiles("./data/t10k-labels-idx1-ubyte", "./data/t10k-images-idx3-ubyte");
                 var activation = new Sigmoid();
-                var net = new Network(new List<int>() { 784, 30, 10 }, activation);
+                var init = new ScaledInitializer();
+                var net = new Network(new List<int>() { 784, 30, 10 }, activation, init);
 
                 net.SGD(trainingExamples, 30, 10, 3.0, testExamples);
             }
