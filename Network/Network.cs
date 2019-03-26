@@ -8,8 +8,14 @@ using System.Diagnostics;
 
 namespace NeuralNet
 {
-    class Network
+    public delegate void EpochReporter(int EpochNumber, TimeSpan epochDuration);
+    public delegate void EpochTestReporter(int EpochNumber, int testCount, int successCount);
+
+    public class Network
     {
+        public EpochReporter OnEpochComplete { get; set; }
+        public EpochTestReporter OnEpochTestComplete { get; set; }
+        
         private List<Layer> Layers = new List<Layer>();
 
         public Network(List<int> sizes, Activator activator, IWeightBiasInitializer defaultInitializer = null)
@@ -45,28 +51,42 @@ namespace NeuralNet
         {
             for (int e = 0; e < epochs; e++)
             {
-                var w = Stopwatch.StartNew();
-                trainingData.Shuffle();
-                int batchStart = 0;
-                while (batchStart < trainingData.Count)
-                {
-                    var batch = trainingData.GetRange(batchStart, batchSize);
-                    // use backPropagation to calculate changes to weights and biases for the miniBatch and update
-                    UpdateMiniBatch(batch, learningRate);
+                var epochNumber = e + 1;
+                var epochTime = Stopwatch.StartNew();
+                RunEpochTraining(trainingData, batchSize, learningRate);
+                epochTime.Stop();
 
-                    // Clean up batch
-                    batchStart += batchSize;
+                if (OnEpochComplete != null)
+                {
+                    OnEpochComplete(epochNumber, epochTime.Elapsed);
                 }
-
-                System.Console.WriteLine($"Epoch {e + 1} of {epochs} completed in {w.Elapsed.TotalSeconds}s");
-                if (testData.Count > 0)
+                
+                if (testData != null && testData.Count > 0)
                 {
-                    EvaluateTestData(testData);
+                    int succeeded = EvaluateTestData(testData);
+                    if (OnEpochTestComplete != null)
+                    {
+                        OnEpochTestComplete(epochNumber, testData.Count, succeeded);
+                    }
                 }
             }
         }
 
-        private void EvaluateTestData(List<Example> testData)
+        private void RunEpochTraining(List<Example> trainingData, int batchSize, double learningRate)
+        {
+            trainingData.Shuffle();
+
+            int batchStart = 0;
+            while (batchStart < trainingData.Count)
+            {
+                var batch = trainingData.GetRange(batchStart, batchSize);
+
+                UpdateMiniBatch(batch, learningRate);
+                batchStart += batchSize;
+            }
+        }
+
+        private int EvaluateTestData(List<Example> testData)
         {
             var successCount = 0;
             foreach (var example in testData)
@@ -78,8 +98,7 @@ namespace NeuralNet
                     successCount++;
                 }
             }
-            var percent = ((double)successCount / testData.Count).ToString("0.00%");
-            System.Console.WriteLine($"\tTest Results: {successCount}/{testData.Count} examples correct. ({percent})");
+            return successCount;
         }
 
         private int ConvertActivationToDigit(Vec outputActivation)
