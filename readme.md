@@ -6,8 +6,8 @@ This project is a basic implementation of a neural network based primarily on th
 
 The primary goals of this project are:
 
-    - To understand and internalize the basic concepts behind neural networks, the backpropagation alogrithm, and deep learning.
-    - To create an object-oriented implementation of a neural network with an intuitive API in a language that is less commonly used for deep learning.
+- To understand and internalize the basic concepts behind neural networks, the backpropagation alogrithm, and deep learning.
+- To create an object-oriented implementation of a neural network with an intuitive API in a language that is less commonly used for deep learning.
 
 ## Requirements to run this code
 
