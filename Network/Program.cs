@@ -13,13 +13,14 @@ namespace NeuralNet
         {
             try
             {
-                Control.UseNativeMKL();
+                //Control.UseNativeMKL();   // Uncomment if MKL installed locally
                 var trainingExamples = DataLoader.LoadFromFiles("./data/train-labels-idx1-ubyte", "./data/train-images-idx3-ubyte");
                 var testExamples = DataLoader.LoadFromFiles("./data/t10k-labels-idx1-ubyte", "./data/t10k-images-idx3-ubyte");
                 var activation = new Sigmoid();
                 var init = new ScaledInitializer();
                 var net = new Network(new List<int>() { 784, 30, 10 }, activation, init);
 
+                // These properties allow the definition of callback functions for training events
                 net.OnEpochComplete = delegate (int epoch, TimeSpan duration)
                 {
                     Console.WriteLine($"Finished epoch number {epoch} in {duration.TotalSeconds} seconds");
@@ -38,8 +39,6 @@ namespace NeuralNet
             {
                 System.Console.WriteLine(ex.ToString());
             }
-
-
         }
     }
 }
